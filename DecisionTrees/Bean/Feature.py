@@ -3,6 +3,7 @@ Created on Sep 18, 2015
 
 @author: NiharKhetan
 '''
+from collections import Counter
 
 class Feature(object):
     '''
@@ -35,16 +36,15 @@ class Feature(object):
         return self.__discreteSet__
     
     def __calculateDiscreteSet__(self, data):
-        discreteSet = []
-        for eachType in data:
-            if eachType not in discreteSet:
-                discreteSet.append(eachType)
-        return discreteSet
+        set = Counter(data)
+        return set
     
 if __name__ == '__main__':
     f1 = Feature("Feature1", [1,1,1,1,1,1,1,1,0,0,3,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0])
-    print f1.getName()
-    print f1.getData()
+    print f1.getName()   
     print f1.getCount()
     print f1.isClassLabel()
     print f1.getDiscreteSet()
+    print f1.getDiscreteSet().keys()
+    print f1.getDiscreteSet().values()
+    print f1.getDiscreteSet()[f1.getDiscreteSet().keys()[0]]
