@@ -8,27 +8,39 @@ import numpy as np
 from DataParser.ReadCSV import *
 from Bean.Feature import Feature
 
-
 def getEntropy(feature):
     n = feature.getCount()
-    set = feature.getDiscreteSet()
-    keys = set.keys()
-    values = set.values()
+    fSet = feature.getDiscreteSet()
+    keys = fSet.keys()
+    values = fSet.values()
     entropy = 0
 
     for v in values:
         entropy += (v / float(n)) * (np.log2(v / float(n)))
     return entropy*(-1) 
 
-def getInformationGain(entropy, entropySv):
-    '''entropySv is a list of tuple (x, y, z):
-    x is total no of items in data set
-    y is no of + items
-    z is no of - items'''
+def getInformationGain(feature, classLabelFeature):
+    '''calculates the information gain for a given feature
+    feature: type(object) : feature of which you want to calculate information gain of
+    classLabelFeature: type(object) : class label as given in the dataset.'''
+        
+    fSetFeature = feature.getDiscreteSet()    
+    subLabels = []
+    for eachKey in fSetFeature:
+        indexOfEachFeature = []
+        for i in range(0, feature.getCount()):
+            if eachKey == feature.getData()[i]:
+                indexOfEachFeature.append(i)
+        data = []
+        for eachIndex in indexOfEachFeature:
+            data.append(classLabelFeature.getData()[eachIndex])
+            
+        subLabels.append(Feature("subF", data))
+    
     sumSv = 0
-    for Sv in entropySv:
-        sumSv -= (Sv[1]+Sv[2])/float(Sv[0])*getEntropy(Sv[1], Sv[2])
-    informationGain = entropy + sumSv
+    for subLabel in subLabels:
+        sumSv -= subLabel.getCount()/float(classLabelFeature.getCount())*getEntropy(subLabel)
+    informationGain = getEntropy(classLabelFeature) + sumSv
     return informationGain
 
 def convertVectorToColumnar(vector):
@@ -43,17 +55,18 @@ def convertVectorToColumnar(vector):
     return columns
 
 if __name__ == '__main__':
-    '''
-    positive = 5
-    negative = 9
-    entropy = getEntropy(positive, negative)
-    print entropy
-    
-    print getInformationGain(entropy, [(14, 3, 4),(14, 6, 1)])
-    print getInformationGain(entropy, [(14, 6, 2),(14, 3, 3)])
-    '''
-    training_data = "../DataParser/zoo-train.csv"
+
+    training_data = "zoo-train.csv"
     vector = readFileAsVector(training_data)
     columns = convertVectorToColumnar(vector)
     classLabel = columns[16]
     print getEntropy(columns[16])
+    
+    print getInformationGain(columns[0], columns[16])
+    infogainAllFeatures = []
+    for column in columns[:-1]:
+        infogainAllFeatures.append(getInformationGain(column, columns[-1]))
+        
+    print infogainAllFeatures
+    print max(infogainAllFeatures)
+    print infogainAllFeatures.index(max(infogainAllFeatures))
