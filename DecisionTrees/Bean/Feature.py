@@ -7,7 +7,7 @@ from collections import Counter
 
 class Feature(object):
     '''
-    classdocs
+    This class represent each column in the dataset
     '''
 
     def __init__(self, name, data, isClassLabel = False):
@@ -26,6 +26,11 @@ class Feature(object):
     def getData(self):
         return self.__data__
     
+    def setData(self, data):
+        self.__data__ = data
+        self.__count__ = len(data)
+        self.__discreteSet__ = self.__calculateDiscreteSet__(data)
+        
     def getCount(self):
         return self.__count__
     
