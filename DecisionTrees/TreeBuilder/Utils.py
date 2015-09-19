@@ -9,6 +9,11 @@ from DataParser.ReadCSV import *
 from Bean.Feature import Feature
 
 def getEntropy(feature):
+    '''
+    Gets the entropy for a given feature. 
+    @param feature: type(object)
+    @return entropy: type(float)
+    '''
     n = feature.getCount()
     fSet = feature.getDiscreteSet()
     keys = fSet.keys()
@@ -20,10 +25,12 @@ def getEntropy(feature):
     return entropy*(-1) 
 
 def getInformationGain(feature, classLabelFeature):
-    '''calculates the information gain for a given feature
-    feature: type(object) : feature of which you want to calculate information gain of
-    classLabelFeature: type(object) : class label as given in the dataset.'''
-        
+    '''
+    calculates the information gain for a given feature
+    @param feature: type(object) : feature of which you want to calculate information gain of
+    @param classLabelFeature: type(object) : class label as given in the dataset.
+    @return informationGain: type(float)
+    '''        
     fSetFeature = feature.getDiscreteSet()    
     subLabels = []
     for eachKey in fSetFeature:
@@ -44,7 +51,13 @@ def getInformationGain(feature, classLabelFeature):
     return informationGain
 
 def convertVectorToColumnar(vector):
-    '''This returns the whole data as a list of features objects'''
+    '''
+    This returns the whole data as a list of features objects
+    currently data is in form [[],[],[]]
+    It converts it to [f0,f1,f2] where each fi is and object
+    @param vector: type(list) vector which is the whole dataset
+    @return columns: type(list) which is the whole data stored as columns
+    '''
     columns = []
     columnLabels = vector[0]
     for column in range(0, len(columnLabels)):
