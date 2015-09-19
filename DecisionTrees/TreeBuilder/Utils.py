@@ -67,6 +67,42 @@ def convertVectorToColumnar(vector):
         columns.append(Feature(columnLabels[column], columnData))
     return columns
 
+
+def vectorSplit(columnnarFeatureVector, classLabelFeature, splitFeature):
+    '''
+    Split the vector on a given SplitFeature and return a collection of sub-vectors 
+    @param columnnarFeatureVector: type(list) Feature Vector dataset in the columnar fashion 
+    @return newSubFeatureCollection: type(list) Collection of sub-vectors which exclude the splitFeature
+    '''
+
+    # Collection to hold new sub vector datasets        
+    newSubFeatureCollection = []
+       
+    # For every discrete value in the split feature, create a new sub-feature list excluding the split feature
+    for discreteVal in splitFeature.getDiscreteSet().keys():
+        
+        subFeatureList = []
+        
+        # Get the indices of all the data points in the splitFeature which match the current discrete value
+        matchDataIndexList = [i for i,x in enumerate(splitFeature.getData()) if x == discreteVal]
+        
+        # Get the data points of every feature from the original vector dataset which match the index found above
+        for i in range(len(columnnarFeatureVector)):
+            
+            # Exclude the data points of split feature
+            if columnnarFeatureVector[i] != splitFeature:
+                
+                # Get all the data points of the current feature which match the index of the current discrete value of the splitFeature
+                tempFeatureData = [ columnnarFeatureVector[i].getData()[idx] for idx in matchDataIndexList]
+
+                # Create a new feature with the filtered data AND append it the feature list of the current discrete value
+                subFeatureList.append(Feature(columnnarFeatureVector[i].getName(), tempFeatureData))
+    
+        # Append the final sub-feature list for the current discrete value into the master sub-feature collection 
+        newSubFeatureCollection.append([str(discreteVal), subFeatureList])
+    
+    return newSubFeatureCollection
+
 if __name__ == '__main__':
 
     training_data = "zoo-train.csv"
@@ -83,3 +119,15 @@ if __name__ == '__main__':
     print infogainAllFeatures
     print max(infogainAllFeatures)
     print infogainAllFeatures.index(max(infogainAllFeatures))
+    
+    print infogainAllFeatures
+    
+    newSubFeatureCollection = vectorSplit(columns, columns[16], columns[12])
+    print
+    print "Splitting on :", columns[12].getName()
+    print
+    for subFeatureBucket in newSubFeatureCollection:
+        print "DiscreteVal:", subFeatureBucket[0], "\t|\t",
+        for feature in subFeatureBucket[1]:
+            print  feature.getName(), "\t|\t", feature.getCount(), "\t|\t",
+        print
