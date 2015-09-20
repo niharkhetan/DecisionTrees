@@ -272,7 +272,7 @@ def computeConfusionMatrix(actualClassLabelList, predictedClassLabelList):
     global depthLimit
     
     print "\n","="*90
-    print "Compute Confustion Matrix"
+    print "\t\t\t\tCompute Confustion Matrix"
     print "="*90
 
     print actualClassLabelList
@@ -293,6 +293,8 @@ def computeConfusionMatrix(actualClassLabelList, predictedClassLabelList):
     print "\n","*"*90
     print "\t!!!!!!!\t\tError Rate at DepthLimit (%d) is %f\t!!!!!!!" % (depthLimit, errorRate)
     print "*"*90
+    
+    
 def testModel():
     ''' Test the model '''
 
@@ -364,7 +366,7 @@ def main():
     trainModel(training_data)
     
     # Print decision tree
-    #printDecisionTree()
+    printDecisionTree()
     
     # Print decision tree dict
     # printDecisionTreeDict()
@@ -372,7 +374,7 @@ def main():
     # Test model
     actualClassLabelList, predictedClassLabelList = testModel()
     
-    computeConfusionMatrix(actualClassLabelList, predictedClassLabelList)
+    #computeConfusionMatrix(actualClassLabelList, predictedClassLabelList)
     
 if __name__ == '__main__':
     
