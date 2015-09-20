@@ -113,7 +113,7 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     global decisionTreeDict, depthLimit
 
     # Stop if max depth reached
-    if depth == depthLimit:
+    if depth == depthLimit or len(columnarFeatureVector)==1:
         # Get the Majority / Most repeated class label of the training data set to assign the classification label to the current attribute
         majorityClassLabel = columnarFeatureVector[-1].getDiscreteSet().most_common(1)[0][0]
         # Build Leaf Node and add it as a child to the current node
@@ -245,7 +245,10 @@ def classifyDataPoint(dataPoint, featureNameList, majorityClassLabel):
     
     # Get the initial feature to check 
     featureToCheck = rootDecisionTree.getNode()
-        
+    
+    # Initialize classificationLabel
+    classificationLabel = None
+    
     while featureToCheck in featureNameList:  
         # Get the data point value for the feature
         attribute = dataPoint.get(featureToCheck)
@@ -295,14 +298,13 @@ def computeConfusionMatrix(actualClassLabelList, predictedClassLabelList):
     print "*"*90
     
     
-def testModel():
+def testModel(test_data):
     ''' Test the model '''
 
     # Global declaration
     global rootDecisionTree,decisionTreeDict
 
     # Create vector of the test data set
-    test_data = "zoo-test_withoutFirstFeature.csv"
     vectorDataSet = readFileAsVector(test_data)
     
     # Convert to columnar to get all the classification labels easily
@@ -361,26 +363,30 @@ def main():
     global rootDecisionTree,decisionTreeDict
     
     training_data = "zoo-train_withoutFirstFeature.csv"
+    test_data = "zoo-test_withoutFirstFeature.csv"
+    
+    training_data = "carvana_train.csv"
+    test_data = "carvana_test.csv"
     
     # Train model
     trainModel(training_data)
     
     # Print decision tree
-    printDecisionTree()
+    # printDecisionTree()
     
     # Print decision tree dict
     # printDecisionTreeDict()
     
     # Test model
-    actualClassLabelList, predictedClassLabelList = testModel()
+    actualClassLabelList, predictedClassLabelList = testModel(test_data)
     
-    #computeConfusionMatrix(actualClassLabelList, predictedClassLabelList)
+    computeConfusionMatrix(actualClassLabelList, predictedClassLabelList)
     
 if __name__ == '__main__':
     
     # Global variables
     rootDecisionTree = None
     decisionTreeDict = {}   #Master dictionary
-    depthLimit = 3
+    depthLimit = 5
     main()
     
