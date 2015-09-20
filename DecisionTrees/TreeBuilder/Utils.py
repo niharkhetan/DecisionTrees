@@ -357,22 +357,16 @@ def printDecisionTreeDict():
     for key, value in decisionTreeDict.iteritems():
         print key,":",value
          
-def main():
+def compute(training_data, test_data, depthLimitx):
     ''' Main '''
     # Global declaration
-    global rootDecisionTree,decisionTreeDict
-    
-    training_data = "zoo-train_withoutFirstFeature.csv"
-    test_data = "zoo-test_withoutFirstFeature.csv"
-    
-    training_data = "carvana_train.csv"
-    test_data = "carvana_test.csv"
-    
+    global rootDecisionTree,decisionTreeDict, depthLimit
+    depthLimit = depthLimitx
+    rootDecisionTree = None
+    decisionTreeDict = {}
+      
     # Train model
     trainModel(training_data)
-    
-    # Print decision tree
-    # printDecisionTree()
     
     # Print decision tree dict
     # printDecisionTreeDict()
@@ -380,7 +374,9 @@ def main():
     # Test model
     actualClassLabelList, predictedClassLabelList = testModel(test_data)
     
-    computeConfusionMatrix(actualClassLabelList, predictedClassLabelList)
+    #computeConfusionMatrix(actualClassLabelList, predictedClassLabelList)
+    
+    return actualClassLabelList, predictedClassLabelList
     
 if __name__ == '__main__':
     
@@ -388,5 +384,5 @@ if __name__ == '__main__':
     rootDecisionTree = None
     decisionTreeDict = {}   #Master dictionary
     depthLimit = 5
-    main()
+    compute()
     

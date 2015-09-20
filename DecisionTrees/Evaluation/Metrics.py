@@ -13,25 +13,38 @@ def findAccuracy(predicted, expected):
     Returns the Accuracy which is correctly predicted by total 
     @param predicted: type(list) list of predicted values
     @param expected: type(list) list of expected values
-    @return: type(float) accuracy in percentage 
     '''
-    
+    print "\n","="*90
+    print "\t\t\t\tACCURACY"
+    print "="*90
     correct = 0
     for i in range(0, len(predicted)):
         if predicted[i] == expected[i]:
             correct += 1
     accuracy = correct / float(len(predicted)) * 100
-    return accuracy
+    print "\nIncorrect Classification Count: %d \tCorrect Classification Count: %d" %(len(predicted) - correct, correct)
+    print "\n","*"*90
+    print "\t!!!!!!!\t\tAccuracy is %f\t!!!!!!!" % (accuracy)
+    print "*"*90
 
 def findErrorRate(predicted, expected):
     '''
     Returns the ErrorRate which is incorrectly predicted by total 
     @param predicted: type(list) list of predicted values
     @param expected: type(list) list of expected values
-    @return: type(float) ErroRate in percentage 
     '''
-    acc = findAccuracy(predicted, expected)
-    return (100 - acc)    
+    print "\n","="*90
+    print "\t\t\t\t ERROR RATE"
+    print "="*90
+    incorrect = 0
+    for i in range(0, len(predicted)):
+        if predicted[i] != expected[i]:
+            incorrect += 1
+    errorRate = incorrect / float(len(predicted)) * 100
+    print "\nIncorrect Classification Count: %d \tCorrect Classification Count: %d" %(incorrect, len(predicted) - incorrect)
+    print "\n","*"*90
+    print "\t!!!!!!!\t\tError Rate is %f\t!!!!!!!" % (errorRate)
+    print "*"*90    
 
 def indexListForItem(item, inputList):    
     list  = [i for i,x in enumerate(inputList) if x == item]
@@ -80,6 +93,11 @@ def printConfusionMatrix(cmatrix):
     prints the confusion matrix
     @param cmatrix: type(dict)
     '''
+    
+    print "\n","="*90
+    print "\t\t\t\tCONFUSION MATRIX"
+    print "="*90
+    print "\n"
     print '*'*30, 'Predicted Values As Columns', '*'*30
     print '*'*30, 'Expected Values As Rows    ', '*'*30
     print '\n\t\t:',
@@ -92,6 +110,7 @@ def printConfusionMatrix(cmatrix):
         for value in cmatrix[key]:
             print '\t',value,'\t|',
         print ''            
+
 
 if __name__ == '__main__':
     predicted = [1,1,4]
