@@ -3,11 +3,12 @@ Created on Sep 17, 2015
 
 @author: NiharKhetan
 '''
-
+from __future__ import division
 import numpy as np
 from DataParser.ReadCSV import readFileAsVector
 from Bean.Feature import Feature
 from Bean.Node import *
+
 
 def getEntropy(feature):
     '''
@@ -109,8 +110,20 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     Build decision tree 
     '''
     # Global declaration
-    global decisionTreeDict
-        
+    global decisionTreeDict, depthLimit
+
+    # Stop if max depth reached
+    if depth == depthLimit:
+        # Get the Majority / Most repeated class label of the training data set to assign the classification label to the current attribute
+        majorityClassLabel = columnarFeatureVector[-1].getDiscreteSet().most_common(1)[0][0]
+        # Build Leaf Node and add it as a child to the current node
+        newLeafNode = Node(majorityClassLabel, discreteValue ,None, [], depth, True)
+        node.addChildNode(newLeafNode)
+        if decisionTreeDict.get(node.getNode()) is None:
+            decisionTreeDict[node.getNode()] = {}
+        decisionTreeDict[node.getNode()][discreteValue] = majorityClassLabel
+        return node
+            
     # Find entropy of the class label
     entropy = getEntropy(columnarFeatureVector[-1])
     
@@ -214,10 +227,10 @@ def trainModel(training_data):
     # Global declaration
     global rootDecisionTree
     
-    # Read the CSV dataset file as vector
+    # Read the CSV data set file as vector
     vector = readFileAsVector(training_data)
     
-    # Convert the dataset into columnar format
+    # Convert the data set into columnar format
     columnarVectorDataset = convertVectorToColumnar(vector)
     
     # Build decision tree
@@ -254,10 +267,32 @@ def classifyDataPoint(dataPoint, featureNameList, majorityClassLabel):
     return classificationLabel
 
 def computeConfusionMatrix(actualClassLabelList, predictedClassLabelList):
-    print "\nCompute Confustion Matrix"
+    
+    # Global declaration
+    global depthLimit
+    
+    print "\n","="*90
+    print "Compute Confustion Matrix"
+    print "="*90
+
     print actualClassLabelList
     print predictedClassLabelList
     
+    totalDatasetCount = len(actualClassLabelList)
+    correctClassificationCount = 0
+    incorrectClassificationCount = 0
+    
+    for i in range(len(actualClassLabelList)):
+        if actualClassLabelList[i] != predictedClassLabelList[i]:
+            incorrectClassificationCount += 1
+    
+    print "\nIncorrect Classification Count: %d \tTotal Dataset Count: %d" %(incorrectClassificationCount, totalDatasetCount)
+    
+    errorRate = incorrectClassificationCount / totalDatasetCount
+    
+    print "\n","*"*90
+    print "\t!!!!!!!\t\tError Rate at DepthLimit (%d) is %f\t!!!!!!!" % (depthLimit, errorRate)
+    print "*"*90
 def testModel():
     ''' Test the model '''
 
@@ -344,5 +379,6 @@ if __name__ == '__main__':
     # Global variables
     rootDecisionTree = None
     decisionTreeDict = {}   #Master dictionary
-    
+    depthLimit = 3
     main()
+    
