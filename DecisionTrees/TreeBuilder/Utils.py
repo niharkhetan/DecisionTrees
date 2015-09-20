@@ -268,35 +268,6 @@ def classifyDataPoint(dataPoint, featureNameList, majorityClassLabel):
         classificationLabel = majorityClassLabel
 
     return classificationLabel
-
-def computeConfusionMatrix(actualClassLabelList, predictedClassLabelList):
-    
-    # Global declaration
-    global depthLimit
-    
-    print "\n","="*90
-    print "\t\t\t\tCompute Confustion Matrix"
-    print "="*90
-
-    print actualClassLabelList
-    print predictedClassLabelList
-    
-    totalDatasetCount = len(actualClassLabelList)
-    correctClassificationCount = 0
-    incorrectClassificationCount = 0
-    
-    for i in range(len(actualClassLabelList)):
-        if actualClassLabelList[i] != predictedClassLabelList[i]:
-            incorrectClassificationCount += 1
-    
-    print "\nIncorrect Classification Count: %d \tTotal Dataset Count: %d" %(incorrectClassificationCount, totalDatasetCount)
-    
-    errorRate = incorrectClassificationCount / totalDatasetCount
-    
-    print "\n","*"*90
-    print "\t!!!!!!!\t\tError Rate at DepthLimit (%d) is %f\t!!!!!!!" % (depthLimit, errorRate)
-    print "*"*90
-    
     
 def testModel(test_data):
     ''' Test the model '''
@@ -373,8 +344,6 @@ def compute(training_data, test_data, depthLimitx):
     
     # Test model
     actualClassLabelList, predictedClassLabelList = testModel(test_data)
-    
-    #computeConfusionMatrix(actualClassLabelList, predictedClassLabelList)
     
     return actualClassLabelList, predictedClassLabelList
     
