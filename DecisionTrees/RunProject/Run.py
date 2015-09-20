@@ -3,8 +3,9 @@ Created on Sep 20, 2015
 
 @author: NiharKhetan
 '''
-from TreeBuilder.Utils import *
+from TreeBuilder.BuildDecisionTree import *
 from Evaluation.Metrics import *
+
 def main():
     ''' Main '''
    
