@@ -53,3 +53,5 @@ if __name__ == '__main__':
     print f1.getDiscreteSet().keys()
     print f1.getDiscreteSet().values()
     print f1.getDiscreteSet()[f1.getDiscreteSet().keys()[0]]
+    print f1.getDiscreteSet().keys()[0]
+    print f1.getDiscreteSet().most_common(1)[0][0]
