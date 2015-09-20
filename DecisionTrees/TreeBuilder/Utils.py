@@ -5,8 +5,9 @@ Created on Sep 17, 2015
 '''
 
 import numpy as np
-from DataParser.ReadCSV import *
+from DataParser.ReadCSV import readFileAsVector
 from Bean.Feature import Feature
+from Bean.Node import *
 
 def getEntropy(feature):
     '''
@@ -67,14 +68,13 @@ def convertVectorToColumnar(vector):
         columns.append(Feature(columnLabels[column], columnData))
     return columns
 
-
 def vectorSplit(columnnarFeatureVector, classLabelFeature, splitFeature):
     '''
     Split the vector on a given SplitFeature and return a collection of sub-vectors 
     @param columnnarFeatureVector: type(list) Feature Vector dataset in the columnar fashion 
     @return newSubFeatureCollection: type(list) Collection of sub-vectors which exclude the splitFeature
     '''
-
+    
     # Collection to hold new sub vector datasets        
     newSubFeatureCollection = []
        
@@ -100,34 +100,111 @@ def vectorSplit(columnnarFeatureVector, classLabelFeature, splitFeature):
     
         # Append the final sub-feature list for the current discrete value into the master sub-feature collection 
         newSubFeatureCollection.append([str(discreteVal), subFeatureList])
+        #newSubFeatureCollection.append(subFeatureList)
     
-    return newSubFeatureCollection
+    return sorted(newSubFeatureCollection)
 
-if __name__ == '__main__':
+def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
+    ''' 
+    Build decision tree 
+    '''
+    # Find entropy of the class label
+    entropy = getEntropy(columnarFeatureVector[-1])
+    
+    # If entropy zero, leaf reached. Terminate 
+    if entropy == 0:
+        # Build Leaf Node and add it as a child to the current node
+        newLeafNode = Node(columnarFeatureVector[-1].getData()[0], discreteValue ,None, [], depth, True)
+        node.addChildNode(newLeafNode)
+        return node
+    
+    # Find information gain of all the features
+    infogainAllFeatures = []
+    for column in columnarFeatureVector[:-1]:
+        infogainAllFeatures.append(getInformationGain(column, columnarFeatureVector[-1]))
+            
+    # Index of the feature with maximum info gain
+    splitNodeIndex = infogainAllFeatures.index(max(infogainAllFeatures))
+    
+    print "\n\n","*" * 80
+    if node is None:
+        # Build tree for the node: root
+        print ('Build Tree \tDepth : %s \tNode: root' % (depth))
+        newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), 'root', columnarFeatureVector[splitNodeIndex], [], depth)
+        node = newDecisionNode
+    else:
+        print ('Build Tree \tDepth : %s \tNode: %s \tAttribute: %s' % (depth, node.getNode(), node.getAttribute()))
+        newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), discreteValue, columnarFeatureVector[splitNodeIndex], [], depth)
+        node.addChildNode(newDecisionNode)
+    print "*" * 80,"\n"
 
-    training_data = "zoo-train.csv"
+    newSubFeatureCollection = vectorSplit(columnarFeatureVector, columnarFeatureVector[-1], columnarFeatureVector[splitNodeIndex])
+    
+    print "Number of Children:", len(newSubFeatureCollection),"\n"
+    print "Splitting on :", columnarFeatureVector[splitNodeIndex].getName(),"\n"
+    
+    # Print Node details
+    for subFeatureBucket in newSubFeatureCollection:
+        print "DiscreteVal:", subFeatureBucket[0], "\t| ",
+        for feature in subFeatureBucket[1]:
+            padding = " |"
+            if feature.getCount() > 9:
+                padding = "|"
+            print feature.getName(), "-", feature.getCount(), padding,
+        print
+
+    # Recurse over each subFeature in the new feature collection for each discrete value of the split feature
+    for subFeatureBucket in newSubFeatureCollection:
+        buildDecisionTree(subFeatureBucket[1], newDecisionNode, subFeatureBucket[0], depth+1 )   
+              
+    return node
+
+def printTree(node):
+    '''
+    Prints the Decision Tree using recursion
+    ''' 
+    # Return if node is leaf
+    if node.isLeaf():
+        return
+    
+    # Print attributes of node
+    print "\n","-"*90
+    print "Attribute:",node.getAttribute(),
+    print "\tNode:",node.getNode(), 
+    print "\tLevel:", node.getLevel(),
+    print "\tChildren Count:", len(node.getChildren())
+    print "\n","-"*90
+    
+    # Print attributes of children 
+    children = node.getChildren()
+    if children is not None and len(children) > 0:
+        print "\t***Children***"
+        for i in range(len(children)):
+            print "\tAttribute:",children[i].getAttribute(),
+            print "\tNode:",children[i].getNode(),
+            print "\tLevel:",  children[i].getLevel(),
+            if children[i].isLeaf():
+                print "\t ClassificationLabel:",children[i].getNode(), "\t****** Leaf *****",
+            print
+            
+    # Recurse to print each children
+    if children is not None and len(children) > 0:
+        for i in range(len(children)):
+            printTree(children[i])
+
+def main():
+    ''' Main '''
+    #training_data = "zoo-train.csv"
+    training_data = "zoo-train_withoutFirstFeature.csv"
     vector = readFileAsVector(training_data)
     columns = convertVectorToColumnar(vector)
-    classLabel = columns[16]
-    print getEntropy(columns[16])
+    node = buildDecisionTree(columns, None, None, 0)
     
-    print getInformationGain(columns[0], columns[16])
-    infogainAllFeatures = []
-    for column in columns[:-1]:
-        infogainAllFeatures.append(getInformationGain(column, columns[-1]))
-        
-    print infogainAllFeatures
-    print max(infogainAllFeatures)
-    print infogainAllFeatures.index(max(infogainAllFeatures))
+    print "\n"
+    print "*"*90
+    print "\t\t\t\t Decision Tree"
+    print "*"*90
+    printTree(node)
     
-    print infogainAllFeatures
-    
-    newSubFeatureCollection = vectorSplit(columns, columns[16], columns[12])
-    print
-    print "Splitting on :", columns[12].getName()
-    print
-    for subFeatureBucket in newSubFeatureCollection:
-        print "DiscreteVal:", subFeatureBucket[0], "\t|\t",
-        for feature in subFeatureBucket[1]:
-            print  feature.getName(), "\t|\t", feature.getCount(), "\t|\t",
-        print
+if __name__ == '__main__':
+    main()
