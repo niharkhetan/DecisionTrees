@@ -4,13 +4,14 @@ Created on Sep 17, 2015
 @author: NiharKhetan
 '''
 from Utils import *
+import sys
 
 def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     ''' 
     Build decision tree 
     '''
     # Global declaration
-    global decisionTreeDict, depthLimit
+    global decisionTreeDict, depthLimit, printDecisionTreeBuildProcessFlag
 
     # Stop if max depth reached
     if depth == depthLimit or len(columnarFeatureVector)==1:
@@ -45,18 +46,18 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     # Index of the feature with maximum info gain
     splitNodeIndex = infogainAllFeatures.index(max(infogainAllFeatures))
     
-    print "\n\n","*" * 80
+    sys.stdout.write ( "\n\n" + "*" * 80) if printDecisionTreeBuildProcessFlag == True else None
     if node is None:
         # Build tree for the node: root
-        print ('Build Tree \tDepth : %s \tNode: root' % (depth))
+        sys.stdout.write ('Build Tree \tDepth : %s \tNode: root' % (depth)) if printDecisionTreeBuildProcessFlag == True else None
         newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), 'root', columnarFeatureVector[splitNodeIndex], [], depth)
         node = newDecisionNode
     
     else:        
-        print ('Build Tree \tDepth : %s \tNode: %s \tAttribute: %s' % (depth, node.getNode(), node.getAttribute()))
+        sys.stdout.write('Build Tree \tDepth : %s \tNode: %s \tAttribute: %s' % (depth, node.getNode(), node.getAttribute())) if printDecisionTreeBuildProcessFlag == True else None
         newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), discreteValue, columnarFeatureVector[splitNodeIndex], [], depth)
         node.addChildNode(newDecisionNode)
-    print "*" * 80,"\n"
+    sys.stdout.write("*" * 80 + "\n") if printDecisionTreeBuildProcessFlag == True else ''
 
     # Decision Tree Dictionary to maintain the "attribute" as key and "look up feature" as values 
     if decisionTreeDict.get(node.getNode()) is None:
@@ -69,18 +70,20 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     # Split the vector feature data set
     newSubFeatureCollection = vectorSplit(columnarFeatureVector, columnarFeatureVector[-1], columnarFeatureVector[splitNodeIndex])
     
-    print "Number of Children:", len(newSubFeatureCollection)
-    print "Splitting on :", columnarFeatureVector[splitNodeIndex].getName(),"\n"
+    sys.stdout.write("Number of Children:" + str(len(newSubFeatureCollection))) if printDecisionTreeBuildProcessFlag == True else None
+    sys.stdout.write("Splitting on :" + columnarFeatureVector[splitNodeIndex].getName() + "\n") if printDecisionTreeBuildProcessFlag == True else None
     
     # Print Node details
     for subFeatureBucket in newSubFeatureCollection:
-        print "DiscreteVal:", subFeatureBucket[0], "\t| ",
+        #print "DiscreteVal:", subFeatureBucket[0], "\t| ",
+        sys.stdout.write("DiscreteVal:" + subFeatureBucket[0] + "\t| ") if printDecisionTreeBuildProcessFlag == True else None
         for feature in subFeatureBucket[1]:
-            padding = " |"
+            padding = " | "
             if feature.getCount() > 9:
-                padding = "|"
-            print feature.getName(), "-", feature.getCount(), padding,
-        print
+                padding = "| "
+            #print feature.getName(), "-", feature.getCount(), padding,
+            sys.stdout.write(feature.getName() + "-" + str(feature.getCount()) + padding) if printDecisionTreeBuildProcessFlag == True else None
+        sys.stdout.write("\n") if printDecisionTreeBuildProcessFlag == True else None
 
     # Recurse over each subFeature in the new feature collection for each discrete value of the split feature
     for subFeatureBucket in newSubFeatureCollection:
@@ -228,19 +231,17 @@ def printDecisionTreeDict():
     for key, value in decisionTreeDict.iteritems():
         print key,":",value
          
-def compute(training_data, test_data, depthLimitx):
+def compute(training_data, test_data, depthLimitx, printBuildProcessFlag):
     ''' Main '''
     # Global declaration
-    global rootDecisionTree,decisionTreeDict, depthLimit
+    global rootDecisionTree,decisionTreeDict, depthLimit, printDecisionTreeBuildProcessFlag
     depthLimit = depthLimitx
     rootDecisionTree = None
     decisionTreeDict = {}
+    printDecisionTreeBuildProcessFlag = printBuildProcessFlag
       
     # Train model
     trainModel(training_data)
-    
-    # Print decision tree dict
-    # printDecisionTreeDict()
     
     # Test model
     actualClassLabelList, predictedClassLabelList = testModel(test_data)
@@ -251,7 +252,15 @@ if __name__ == '__main__':
     
     # Global variables
     rootDecisionTree = None
-    decisionTreeDict = {}   #Master dictionary
-    depthLimit = 5
-    compute()
+    decisionTreeDict = {}   # Master dictionary to maintain lookup path for nodes of decision tree
+    depthLimit = 5          # Decision Tree depth
+    printDecisionTreeBuildProcessFlag = False    # Flag to print decision tree build process
     
+    training_data = "zoo-train_withoutFirstFeature.csv"
+    test_data = "zoo-test_withoutFirstFeature.csv"
+    
+    compute(training_data, test_data, depthLimit, printDecisionTreeBuildProcessFlag )
+    
+    #printing decision tree built
+    printDecisionTree()
+

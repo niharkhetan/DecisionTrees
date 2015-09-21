@@ -12,16 +12,15 @@ def main():
    
     #############################################################################
     #change depthLimit for different depth Limits
-    #change training_data and test_data to put file names dircetlt
+    #change training_data and test_data to put file names directly
     #make sure data exists in Dataset folder
     #############################################################################  
-    depthLim = 3
+    depthLim = 3    # Decision Tree depth
     training_data = "zoo-train_withoutFirstFeature.csv"
     test_data = "zoo-test_withoutFirstFeature.csv"
+    printDecisionTreeBuildProcessFlag = False    # Flag to print decision tree build process
     
-    actualClassLabelList, predictedClassLabelList = compute(training_data, test_data, depthLim)
-    
-    print "\n"*3
+    actualClassLabelList, predictedClassLabelList = compute(training_data, test_data, depthLim, printDecisionTreeBuildProcessFlag)
     
     #printing decision tree built
     printDecisionTree()

@@ -14,17 +14,18 @@ def findAccuracy(predicted, expected):
     @param expected: type(list) list of expected values
     '''
     print "\n","="*90
-    print "\t\t\t\tACCURACY"
+    print "\t\t\t\t\tACCURACY"
     print "="*90
     correct = 0
     for i in range(0, len(predicted)):
         if predicted[i] == expected[i]:
             correct += 1
     accuracy = correct / float(len(predicted)) * 100
-    print "\nIncorrect Classification Count: %d \tCorrect Classification Count: %d" %(len(predicted) - correct, correct)
-    print "\n","*"*90
-    print "\t!!!!!!!\t\tAccuracy is %f\t!!!!!!!" % (accuracy)
-    print "*"*90
+    print "\n\tIncorrect Classification Count: %d \tCorrect Classification Count: %d" %(len(predicted) - correct, correct)
+    print "\n\t","*" * 73
+    print "\t\t\t\tAccuracy is %.3f %%" % (accuracy)
+    print "\t","*" * 73
+    print "\n"*2
 
 def findErrorRate(predicted, expected):
     '''
@@ -33,17 +34,19 @@ def findErrorRate(predicted, expected):
     @param expected: type(list) list of expected values
     '''
     print "\n","="*90
-    print "\t\t\t\t ERROR RATE"
+    print "\t\t\t\t\tERROR RATE"    
     print "="*90
     incorrect = 0
     for i in range(0, len(predicted)):
         if predicted[i] != expected[i]:
             incorrect += 1
     errorRate = incorrect / float(len(predicted)) * 100
-    print "\nIncorrect Classification Count: %d \tCorrect Classification Count: %d" %(incorrect, len(predicted) - incorrect)
-    print "\n","*"*90
-    print "\t!!!!!!!\t\tError Rate is %f\t!!!!!!!" % (errorRate)
-    print "*"*90    
+    print "\n\tIncorrect Classification Count: %d \tCorrect Classification Count: %d" %(incorrect, len(predicted) - incorrect)
+    print "\n\t","*" * 73
+    print "\t\t\t\tError Rate is %.3f %%" % (errorRate)
+    print "\t","*" * 73
+    print "\n"*2
+
 
 def indexListForItem(item, inputList):    
     list  = [i for i,x in enumerate(inputList) if x == item]
@@ -124,7 +127,8 @@ if __name__ == '__main__':
         predicted[i] = int(predicted[i])
         expected[i] = int(expected[i])
 
-    print findAccuracy(predicted, expected)
+    findAccuracy(predicted, expected)
+    findErrorRate(predicted, expected)
     cm = confusion_matrix(expected , predicted)
 
     confusionMatrix = constructConfusionMatrix(predicted, expected)
