@@ -6,7 +6,6 @@ Created on Sep 20, 2015
 
 from sklearn.metrics import confusion_matrix
 from collections import Counter
-import matplotlib.pyplot as plt
 
 def findAccuracy(predicted, expected):
     '''
