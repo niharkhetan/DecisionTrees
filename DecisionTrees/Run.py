@@ -15,9 +15,13 @@ def main():
     #change training_data and test_data to put file names directly
     #make sure data exists in Dataset folder
     #############################################################################  
-    depthLim = 3    # Decision Tree depth
+    depthLim = 4   # Decision Tree depth
     training_data = "zoo-train_withoutFirstFeature.csv"
     test_data = "zoo-test_withoutFirstFeature.csv"
+    
+    training_data = "carvana_train.csv"
+    test_data = "carvana_test.csv"
+        
     printDecisionTreeBuildProcessFlag = False    # Flag to print decision tree build process
     
     actualClassLabelList, predictedClassLabelList = compute(training_data, test_data, depthLim, printDecisionTreeBuildProcessFlag)
