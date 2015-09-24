@@ -232,14 +232,14 @@ if __name__ == '__main__':
     depthLimit = 8         # Decision Tree depth
     printDecisionTreeBuildProcessFlag = True    # Flag to print decision tree build process
 
+#    training_data = "carvana_train.csv"
+#    test_data = "carvana_test.csv"
+    
     training_data = "zoo-train.csv"
     test_data = "zoo-test.csv"
-    
-    training_data = "carvana_train_copy.csv"
-    test_data = "carvana_test_copy.csv"
-       
+           
     compute(training_data, test_data, depthLimit, printDecisionTreeBuildProcessFlag )
     
     #printing decision tree built
-    #printDecisionTree()
+    printDecisionTree()
 
