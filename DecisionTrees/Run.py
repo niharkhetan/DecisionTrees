@@ -9,17 +9,16 @@ from Evaluation.Metrics import *
 
 def getUserInput(msg, inputType, options = []):
     ''' Generalized method to get user input '''
-    userOption = raw_input(msg).upper()
-    
+
     while True:
         try:
+            userOption = raw_input(msg).upper()
             if inputType == "int":
                 userOption = int(userOption)
             if len(options) > 0 and userOption not in options:
                 raise ValueError('Invalid choice !') 
         except: 
             print "\nInvalid choice !"
-            userOption = raw_input(msg)
         else:
             break
     
@@ -55,7 +54,7 @@ def main():
     
     datasetListDict = {0: ["zoo-train.csv","zoo-test.csv"],
                    1: ["carvana_train.csv", "carvana_test.csv"]}
-    
+
     userDatasetChoice = getUserDatasetChoice(datasetListDict)
 
     training_data = datasetListDict[userDatasetChoice][0]
