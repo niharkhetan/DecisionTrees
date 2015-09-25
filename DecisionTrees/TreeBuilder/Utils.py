@@ -2,7 +2,7 @@
 Created on Sep 20, 2015
 
 @author   : NiharKhetan, Ghanshyam Malu
-@desc     : Methods to calculate Entroy, Information Gain, Convert the data set vector to columnar and Vector Split to create dataset subsets
+@desc     : Methods to calculate Entropy, Information Gain, Convert the data set vector to columnar and Vector Split to create dataset subsets
 
 '''
 from __future__ import division
