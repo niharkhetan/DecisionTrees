@@ -1,7 +1,9 @@
 '''
 Created on Sep 18, 2015
 
-@author: NiharKhetan
+@author   : NiharKhetan, Ghanshyam Malu
+@desc     : Feature class to hold the feature vector
+
 '''
 from collections import Counter
 
@@ -45,6 +47,7 @@ class Feature(object):
         return set
     
 if __name__ == '__main__':
+    # Sample data to test the class
     f1 = Feature("Feature1", [1,1,1,1,1,1,1,1,0,0,3,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0])
     print f1.getName()   
     print f1.getCount()

@@ -1,7 +1,9 @@
 '''
 Created on Sep 18 , 2015
 
-@author: Ghanshyam Malu
+@author   : NiharKhetan, Ghanshyam Malu
+@desc     : Reads a CSV dataset into vector format.
+
 '''
 
 import csv, sys
@@ -29,6 +31,7 @@ def readFileAsVector(csvFileName):
 
 
 def main():
+    # Sample dataset to test the csv reader
     training_data = "zoo-train.csv"
     vector = readFileAsVector(training_data)
     #print vector  

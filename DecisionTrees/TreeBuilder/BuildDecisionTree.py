@@ -1,11 +1,12 @@
 '''
 Created on Sep 17, 2015
 
-@author: NiharKhetan
+@author   : NiharKhetan, Ghanshyam Malu
+@desc     : Builds the Decision Tree for the given training set and test it against the given train set.
+
 '''
 from Utils import *
 import sys
-import copy
 
 def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     ''' 
@@ -82,7 +83,7 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     return node
 
 def cleanUpDecisionTree(node):
-    ''' Clean up the build Decision Tree. Modify all the nodes whose children have same class label and replace the node with the class label itself'''
+    ''' Clean up the build Decision Tree. Replace all the nodes whose children have same class label with the class label itself'''
     global printDecisionTreeBuildProcessFlag
     
     # Return if node is leaf
@@ -92,34 +93,39 @@ def cleanUpDecisionTree(node):
     # Assume all child labels are same initially
     allChildNodeDict = {}
     
+    # Get all the children
     childrenNodes = node.getChildren()
     
+    # Store all the child nodes and corresponding flags of Leaf check
     for childNode in childrenNodes:   
         returnedNode = cleanUpDecisionTree(childNode)
         allChildNodeDict[returnedNode.getNode()] = returnedNode.isLeaf()
     
-    if checkListHasSameElements(allChildNodeDict.values()) == True and checkListHasSameElements(allChildNodeDict.keys()) == True and allChildNodeDict.values()[0] == True:
-        print "All child features have same labels"        
-        print "Cleaning up feature (", node.getNode(), ") at Level (", node.getLevel(), ") | Attribute ", node.getAttribute()
+    # If all the nodes are same and all the nodes are leaves, replace the node having children with a new single leaf node with the class label   
+    if checkListHasSameElements(allChildNodeDict.values()) == True and checkListHasSameElements(allChildNodeDict.keys()) == True and allChildNodeDict.values()[0] == True:    
         
-#         if node.getAttribute() != 'root':
-        print "Creating new label : ", allChildNodeDict.keys()[0], "in place of feature", node.getNode(), "at level", node.getLevel()
+        sys.stdout.write ( "\nCleaning up feature ("+ node.getNode() + ") at Level (" + str(node.getLevel()) + ") | Attribute " \
+                           + node.getAttribute() + "\n") if printDecisionTreeBuildProcessFlag == True else None
+        
+        sys.stdout.write ( "\nAll child features have same labels\n") if printDecisionTreeBuildProcessFlag == True else None
+        
+        sys.stdout.write ( "\nCreating new label : "+ allChildNodeDict.keys()[0]+ " in place of feature " +node.getNode() \
+                           + "at level" + str(node.getLevel())+ "\n") if printDecisionTreeBuildProcessFlag == True else None
+        
         newLeafNode = Node(allChildNodeDict.keys()[0],node.getAttribute(), None, node.getParentNode(), [], node.getLevel(), True)
-        print "******Count of this common node " , node.getParentNode().getChildren().count(node)
-        print "newLeafParent: ", newLeafNode.getParentNode()
-        print "node parent:", node.getParentNode()
-        print "Leaf", newLeafNode
         
+        # Modify the children list of the parent node to reflect this new leaf node
         nodeIndexInParentChildrenList = node.getParentNode().getChildren().index(node)
         node.getParentNode().getChildren()[nodeIndexInParentChildrenList] = newLeafNode
         node = newLeafNode
 
     return node 
 
-def findLabels(rootDecisionTree):
-    
-    decisionTreeFinalDepth
-    
+def checkListHasSameElements(inputList):
+    ''' Finds if a list has same elements 
+    #http://stackoverflow.com/q/3844948/ '''
+    return not inputList or inputList.count(inputList[0]) == len(inputList)   
+
 def printTree(node):
     '''
     Prints the Decision Tree using recursion
@@ -159,6 +165,16 @@ def printTree(node):
     if children is not None and len(children) > 0:
         for i in range(len(children)):
             printTree(children[i])
+
+def printDecisionTree():
+    ''' Print Decision Tree with formatting'''
+    # Global declaration
+    global rootDecisionTree
+    
+    print "\n\n\n","*"*90
+    print "\t\t\t\t Decision Tree"
+    print "*"*90
+    printTree(rootDecisionTree)
 
 def trainModel(training_data):
     ''' Train the model '''
@@ -253,19 +269,10 @@ def testModel(test_data):
         predictedClassLabelList.append(currentPredictedClassLabel)
             
     return actualClassLabelList, predictedClassLabelList   
-    
-def printDecisionTree():
-    ''' Print Decision Tree with formatting'''
-    # Global declaration
-    global rootDecisionTree
-    
-    print "\n\n\n","*"*90
-    print "\t\t\t\t Decision Tree"
-    print "*"*90
-    printTree(rootDecisionTree)
-                 
+               
 def compute(training_data, test_data, depthLimitx, printBuildProcessFlag, finalDepth):
     ''' Main '''
+    
     # Global declaration
     global rootDecisionTree, depthLimit, printDecisionTreeBuildProcessFlag, decisionTreeFinalDepth
     depthLimit = depthLimitx
@@ -280,14 +287,6 @@ def compute(training_data, test_data, depthLimitx, printBuildProcessFlag, finalD
     actualClassLabelList, predictedClassLabelList = testModel(test_data)
     
     return actualClassLabelList, predictedClassLabelList
-
-
-#http://stackoverflow.com/q/3844948/
-
-#http://stackoverflow.com/q/3844948/
-
-def checkListHasSameElements(inputList):
-    return not inputList or inputList.count(inputList[0]) == len(inputList)   
 
 if __name__ == '__main__':
     
@@ -307,7 +306,4 @@ if __name__ == '__main__':
     
     #printing decision tree built
     printDecisionTree()
-    
-    findLabels(rootDecisionTree)
-
 

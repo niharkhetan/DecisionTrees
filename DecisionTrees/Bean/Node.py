@@ -1,7 +1,17 @@
 '''
 Created on Sep 18, 2015
 
-@author: NiharKhetan
+@author   : NiharKhetan, Ghanshyam Malu
+@desc     : Node class to hold the nodes of the Decision Tree
+
+        self.thisNode     - Node name
+        self.parentNode   - parentNode
+        self.children     - List of children nodes
+        self.level        - level/depth of the node
+        self.feature      - feature vector of the node
+        self.attribute    - attribute of the feature
+        self.leafFlag     - Flag to check if the node is leaf/label
+
 '''
 from Bean.Feature import Feature
 

@@ -1,7 +1,9 @@
 '''
 Created on Sep 20, 2015
 
-@author: NiharKhetan
+@author   : NiharKhetan, Ghanshyam Malu
+@desc     : Methods to compute accuracy, error rate, construct Confusion Matrix.
+
 '''
 
 from sklearn.metrics import confusion_matrix
@@ -115,6 +117,7 @@ def printConfusionMatrix(cmatrix):
 
 
 if __name__ == '__main__':
+    # Sample data to test the metrics
     predicted = [1,1,4]
     expected = [1,0,4]
     predicted = [0, 0, 2, 2, 0, 2, 1]

@@ -1,11 +1,28 @@
 '''
 Created on Sep 20, 2015
 
-@author: NiharKhetan
+@author   : NiharKhetan, Ghanshyam Malu
+@desc     : Core file to run the Decision Tree Modeler
+            Train the model, Test it and plot the confusion matrix
+            Also, visualizes it using the matplotlib.pyplot 
+@Usage    : Execute the python file to run the Decision Tree Modeler
+            $ python Run.py
+
+@Version  : Uses Python 2.7
+
+==========================================================================================
+            Welcome to Decision Tree Modeler
+==========================================================================================
+
+Choose one of the available options:
+
+    0 - Model, Train and Test 'Zoo' data
+    1 - Model, Train and Test 'Carvana' data (personal dataset) 
+
 '''
 from TreeBuilder.BuildDecisionTree import *
 from Evaluation.Metrics import *
-#import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt #Uncomment this line to visualize the confusion matrix using matplotlib
 
 def getUserInput(msg, inputType, options = []):
     ''' Generalized method to get user input '''
@@ -61,11 +78,11 @@ def main():
     training_data = datasetListDict[userDatasetChoice][0]
     test_data =  datasetListDict[userDatasetChoice][1]
     
-    userInput = getUserInput("\nChange default settings for Max Tree Depth, Display log (Y/N)?", "char", ['Y','N'])
+    userInput = getUserInput("\nChange default settings for Max Tree Depth, Display log (Y/N)?... ", "char", ['Y','N'])
 
     if userInput == 'Y':
         
-        userInput = getUserInput("\nDo you wish to change the default Max Depth ("+ str(depthLim)+ ") allowed for the Decision Tree? (Y/N)", "char", ['Y','N'])
+        userInput = getUserInput("\nDo you wish to change the default Max Depth ("+ str(depthLim)+ ") allowed for the Decision Tree? (Y/N)... ", "char", ['Y','N'])
         if userInput == 'Y':
                 userInput = getUserInput("\nEnter the Max Depth for Decision Tree... ", "int", [])
                 if userInput < 1:
@@ -73,7 +90,7 @@ def main():
                 else:
                     depthLim = userInput
         
-        userInput = getUserInput("\nDo you wish to print detailed log for Decision Tree modeling process? (Y/N)", "char", ['Y','N'])        
+        userInput = getUserInput("\nDo you wish to print detailed log for Decision Tree modeling process? (Y/N)... ", "char", ['Y','N'])        
         if userInput == 'Y':
             printDecisionTreeBuildProcessFlag = True
         
@@ -91,7 +108,11 @@ def main():
     #Confusion Matrix
     confusionMatrix = constructConfusionMatrix(predictedClassLabelList, actualClassLabelList)
     printConfusionMatrix(confusionMatrix)
+
     
+    print "\n\n","-" * 90
+    print "\t\tThank you for using the Decision Tree Modeler !"
+    print "-" * 90,"\n\n"
     cm = confusion_matrix(actualClassLabelList , predictedClassLabelList)
     
     #################################################################################
