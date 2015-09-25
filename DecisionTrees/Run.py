@@ -113,13 +113,14 @@ def main():
     print "\n\n","-" * 90
     print "\t\tThank you for using the Decision Tree Modeler !"
     print "-" * 90,"\n\n"
-    cm = confusion_matrix(actualClassLabelList , predictedClassLabelList)
+   
     
     #################################################################################
     # IF SCIKIT IS INSTALLED UNCOMMENT THIS TO GET A CONFUSOIN MATRIX PLOT          #
     #################################################################################
     # Show confusion matrix in a separate window
     '''
+    cm = confusion_matrix(actualClassLabelList , predictedClassLabelList)
     plt.matshow(cm)
     plt.title('Confusion matrix')
     plt.colorbar()

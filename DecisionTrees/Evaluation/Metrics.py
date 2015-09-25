@@ -6,7 +6,7 @@ Created on Sep 20, 2015
 
 '''
 
-from sklearn.metrics import confusion_matrix
+#from sklearn.metrics import confusion_matrix
 from collections import Counter
 
 def findAccuracy(predicted, expected):
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
     findAccuracy(predicted, expected)
     findErrorRate(predicted, expected)
-    cm = confusion_matrix(expected , predicted)
+    #cm = confusion_matrix(expected , predicted)
 
     confusionMatrix = constructConfusionMatrix(predicted, expected)
 
