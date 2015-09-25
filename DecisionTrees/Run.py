@@ -51,6 +51,7 @@ def main():
     depthLim =3   # Decision Tree depth
         
     printDecisionTreeBuildProcessFlag = False    # Flag to print decision tree build process
+    decisionTreeFinalDepth = 0                  # Final depth of the built decision tree
     
     datasetListDict = {0: ["zoo-train.csv","zoo-test.csv"],
                    1: ["carvana_train.csv", "carvana_test.csv"]}
@@ -76,7 +77,7 @@ def main():
         if userInput == 'Y':
             printDecisionTreeBuildProcessFlag = True
         
-    actualClassLabelList, predictedClassLabelList = compute(training_data, test_data, depthLim, printDecisionTreeBuildProcessFlag)
+    actualClassLabelList, predictedClassLabelList = compute(training_data, test_data, depthLim, printDecisionTreeBuildProcessFlag, decisionTreeFinalDepth)
     
     #printing decision tree built
     printDecisionTree()

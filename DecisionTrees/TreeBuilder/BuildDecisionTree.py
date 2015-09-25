@@ -5,20 +5,21 @@ Created on Sep 17, 2015
 '''
 from Utils import *
 import sys
+import copy
 
 def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     ''' 
     Build decision tree 
     '''
     # Global declaration
-    global depthLimit, printDecisionTreeBuildProcessFlag
+    global depthLimit, printDecisionTreeBuildProcessFlag,decisionTreeFinalDepth
 
     # Stop if max depth reached
     if depth == depthLimit or len(columnarFeatureVector)==1:
         # Get the Majority / Most repeated class label of the training data set to assign the classification label to the current attribute
         majorityClassLabel = columnarFeatureVector[-1].getDiscreteSet().most_common(1)[0][0]
         # Build Leaf Node and add it as a child to the current node
-        newLeafNode = Node(majorityClassLabel, discreteValue ,None, [], depth, True)
+        newLeafNode = Node(majorityClassLabel, discreteValue ,None, node, [], depth, True)
         node.addChildNode(newLeafNode)
         return node
             
@@ -28,7 +29,7 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     # If entropy zero, leaf reached. Terminate 
     if entropy == 0:
         # Build Leaf Node and add it as a child to the current node
-        newLeafNode = Node(columnarFeatureVector[-1].getData()[0], discreteValue ,None, [], depth, True)
+        newLeafNode = Node(columnarFeatureVector[-1].getData()[0], discreteValue ,None, node, [], depth, True)
         node.addChildNode(newLeafNode)
         return node
     
@@ -44,12 +45,12 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     if node is None:
         # Build tree for the node: root
         sys.stdout.write ('Build Tree \tDepth : %s \tNode: root\n' % (depth)) if printDecisionTreeBuildProcessFlag == True else None
-        newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), 'root', columnarFeatureVector[splitNodeIndex], [], depth)
+        newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), 'root', columnarFeatureVector[splitNodeIndex], None, [], depth)
         node = newDecisionNode
     
     else:        
         sys.stdout.write('Build Tree \tDepth : %s \tNode: %s \tAttribute: %s\n' % (depth, node.getNode(), node.getAttribute())) if printDecisionTreeBuildProcessFlag == True else None
-        newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), discreteValue, columnarFeatureVector[splitNodeIndex], [], depth)
+        newDecisionNode = Node(columnarFeatureVector[splitNodeIndex].getName(), discreteValue, columnarFeatureVector[splitNodeIndex], node, [], depth)
         node.addChildNode(newDecisionNode)
     sys.stdout.write("*" * 80 + "\n") if printDecisionTreeBuildProcessFlag == True else ''
 
@@ -63,6 +64,8 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
     for subFeatureBucket in newSubFeatureCollection:
         #print "DiscreteVal:", subFeatureBucket[0], "\t| ",
         sys.stdout.write("DiscreteVal: " + subFeatureBucket[0] + "\t| ") if printDecisionTreeBuildProcessFlag == True else None
+        #padding = 7 - len(subFeatureBucket[0])    
+        #print " " *padding,"\t",
         for feature in subFeatureBucket[1]:
             padding = " | "
             if feature.getCount() > 9:
@@ -73,36 +76,83 @@ def buildDecisionTree(columnarFeatureVector, node, discreteValue, depth):
 
     # Recurse over each subFeature in the new feature collection for each discrete value of the split feature
     for subFeatureBucket in newSubFeatureCollection:
-        buildDecisionTree(subFeatureBucket[1], newDecisionNode, subFeatureBucket[0], depth+1 )   
-              
+        decisionTreeFinalDepth = max(decisionTreeFinalDepth, depth+1)
+        buildDecisionTree(subFeatureBucket[1], newDecisionNode, subFeatureBucket[0], depth+1 ) 
+      
     return node
 
+def cleanUpDecisionTree(node):
+    ''' Clean up the build Decision Tree. Modify all the nodes whose children have same class label and replace the node with the class label itself'''
+    global printDecisionTreeBuildProcessFlag
+    
+    # Return if node is leaf
+    if node.isLeaf() == True:
+        return node
+    
+    # Assume all child labels are same initially
+    allChildNodeDict = {}
+    
+    childrenNodes = node.getChildren()
+    
+    for childNode in childrenNodes:   
+        returnedNode = cleanUpDecisionTree(childNode)
+        allChildNodeDict[returnedNode.getNode()] = returnedNode.isLeaf()
+    
+    if checkListHasSameElements(allChildNodeDict.values()) == True and checkListHasSameElements(allChildNodeDict.keys()) == True and allChildNodeDict.values()[0] == True:
+        print "All child features have same labels"        
+        print "Cleaning up feature (", node.getNode(), ") at Level (", node.getLevel(), ") | Attribute ", node.getAttribute()
+        
+#         if node.getAttribute() != 'root':
+        print "Creating new label : ", allChildNodeDict.keys()[0], "in place of feature", node.getNode(), "at level", node.getLevel()
+        newLeafNode = Node(allChildNodeDict.keys()[0],node.getAttribute(), None, node.getParentNode(), [], node.getLevel(), True)
+        print "******Count of this common node " , node.getParentNode().getChildren().count(node)
+        print "newLeafParent: ", newLeafNode.getParentNode()
+        print "node parent:", node.getParentNode()
+        print "Leaf", newLeafNode
+        
+        nodeIndexInParentChildrenList = node.getParentNode().getChildren().index(node)
+        node.getParentNode().getChildren()[nodeIndexInParentChildrenList] = newLeafNode
+        node = newLeafNode
+
+    return node 
+
+def findLabels(rootDecisionTree):
+    
+    decisionTreeFinalDepth
+    
 def printTree(node):
     '''
     Prints the Decision Tree using recursion
     ''' 
     # Return if node is leaf
-    if node.isLeaf():
+    if node is None or node.isLeaf():
         return
     
     # Print attributes of node
     print "\n","-"*90
     print "Attribute:",node.getAttribute(),
-    print "\tNode:",node.getNode(), 
+    print "\tFeature:",node.getNode(), 
     print "\tLevel:", node.getLevel(),
+    if node is not None and node.getParentNode() is not None:
+        print "\tParent Feature:", node.getParentNode().getNode(),
     print "\tChildren Count:", len(node.getChildren())
-    print "\n","-"*90
+    print "-"*90,"\n"
     
     # Print attributes of children 
     children = node.getChildren()
     if children is not None and len(children) > 0:
         print "\t***Children***"
         for i in range(len(children)):
+            
             print "\tAttribute:",children[i].getAttribute(),
-            print "\tNode:",children[i].getNode(),
-            print "\tLevel:",  children[i].getLevel(),
+            padding = 20 - len(children[i].getAttribute())
+            
+            print " " *padding+"\tFeature\t: "+str(children[i].getNode()) if children[i].isLeaf() != True else " " *padding+"\tLabel\t: "+str(children[i].getNode()),
+            padding = 15 - len(children[i].getNode())
+            
+            print " " *padding, "\tLevel:",  children[i].getLevel(),
             if children[i].isLeaf():
-                print "\t ClassificationLabel:",children[i].getNode(), "\t****** Leaf *****",
+                print "\t ClassificationLabel:",children[i].getNode(), "\t****** Label *****",
             print
             
     # Recurse to print each children
@@ -127,12 +177,19 @@ def trainModel(training_data):
     # Build decision tree
     rootDecisionTree = buildDecisionTree(columnarVectorDataset, None, None, 0)
     
+    # Replace feature nodes having children with same class labels with the class label 
+    sys.stdout.write("\n"+"*"*80 + "\n\t\t\t  Cleaning up Decision Tree\n"+ "*"*80 +"\n") if printDecisionTreeBuildProcessFlag == True else None
+    rootDecisionTree = cleanUpDecisionTree(rootDecisionTree)
+    
     return rootDecisionTree
             
 def classifyDataPoint(node, dataPoint, featureNameList, majorityClassLabel):
     ''' Classifies the given data point to one of the Class Labels''' 
 
+    if node is None:
+        return
     # Classification Label found
+
     if node.isLeaf() == True:
         classificationLabel = node.getNode()
         return classificationLabel
@@ -207,13 +264,14 @@ def printDecisionTree():
     print "*"*90
     printTree(rootDecisionTree)
                  
-def compute(training_data, test_data, depthLimitx, printBuildProcessFlag):
+def compute(training_data, test_data, depthLimitx, printBuildProcessFlag, finalDepth):
     ''' Main '''
     # Global declaration
-    global rootDecisionTree, depthLimit, printDecisionTreeBuildProcessFlag
+    global rootDecisionTree, depthLimit, printDecisionTreeBuildProcessFlag, decisionTreeFinalDepth
     depthLimit = depthLimitx
     rootDecisionTree = None
     printDecisionTreeBuildProcessFlag = printBuildProcessFlag
+    decisionTreeFinalDepth = finalDepth
       
     # Train model
     trainModel(training_data)
@@ -224,22 +282,32 @@ def compute(training_data, test_data, depthLimitx, printBuildProcessFlag):
     return actualClassLabelList, predictedClassLabelList
 
 
-            
+#http://stackoverflow.com/q/3844948/
+
+#http://stackoverflow.com/q/3844948/
+
+def checkListHasSameElements(inputList):
+    return not inputList or inputList.count(inputList[0]) == len(inputList)   
+
 if __name__ == '__main__':
     
     # Global variables
     rootDecisionTree = None
-    depthLimit = 8         # Decision Tree depth
+    depthLimit = 6     # Decision Tree depth
     printDecisionTreeBuildProcessFlag = True    # Flag to print decision tree build process
+    decisionTreeFinalDepth = 0
 
-#    training_data = "carvana_train.csv"
-#    test_data = "carvana_test.csv"
-    
+    training_data = "carvana_train.csv"
+    test_data = "carvana_test.csv"
+               
     training_data = "zoo-train.csv"
     test_data = "zoo-test.csv"
-           
-    compute(training_data, test_data, depthLimit, printDecisionTreeBuildProcessFlag )
+
+    compute(training_data, test_data, depthLimit, printDecisionTreeBuildProcessFlag,decisionTreeFinalDepth )
     
     #printing decision tree built
     printDecisionTree()
+    
+    findLabels(rootDecisionTree)
+
 

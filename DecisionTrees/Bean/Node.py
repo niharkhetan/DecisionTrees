@@ -10,23 +10,27 @@ class Node(object):
     classdocs
     '''
     
-    def __init__(self, thisNode, attribute, feature, children, level=0, leafFlag=False):
+    def __init__(self, thisNode, attribute, feature, parentNode, children, level=0, leafFlag=False):
         '''
         Constructor
         '''
         self.thisNode = thisNode
+        self.parentNode = parentNode
         self.children = children
         self.level = level
         self.feature = feature
         self.attribute = attribute
         self.leafFlag = leafFlag
+        
   
     def getNode(self):
         return self.thisNode
+    
+    def getParentNode(self):
+        return self.parentNode
         
     def getFeature(self):
         return self.feature
-
 
     def getChildren(self):
         return self.children
@@ -42,3 +46,9 @@ class Node(object):
     
     def addChildNode(self,childNode):
         self.children.append(childNode)
+        
+    def removeChildNode(self,childNode):
+        self.children.remove(childNode)
+        
+    def removeChildren(self):
+        self.children = []
